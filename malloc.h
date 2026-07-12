@@ -14,5 +14,22 @@
 # define MALLOC_H
 
 # include <sys/mman.h>
+# include <stdbool.h>
+# include <stdio.h>
+
+typedef struct s_block
+{
+	size_t size;
+	bool is_free;
+	struct s_block *next;
+} t_block;
+
+typedef struct s_zone
+{
+	size_t size;
+	t_block *block;
+	struct s_zone *next;
+} t_zone;
+
 
 #endif
