@@ -16,6 +16,9 @@
 # include <sys/mman.h>
 # include <stdbool.h>
 # include <stdio.h>
+# include <math.h>
+
+# define TINY 16480
 
 typedef struct s_block
 {
@@ -30,6 +33,13 @@ typedef struct s_zone
 	t_block *block;
 	struct s_zone *next;
 } t_zone;
+
+typedef struct s_malloc_zone
+{
+	t_zone *tiny;
+	t_zone *small;
+	t_zone *large;
+} malloc_zone;
 
 
 #endif
