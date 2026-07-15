@@ -12,7 +12,7 @@
 
 #include "malloc.h"
 
-// malloc_zone g_zones;
+malloc_zone g_zones;
 
 void *alloc_tiny(size_t size)
 {
@@ -205,6 +205,7 @@ void *alloc_large(size_t size)
 }
 void *malloc(size_t size)
 {
+	write(1, "MALLOC APPELÉ !\n", 17);
 	int adjusted_size;
 
 	adjusted_size = align_16(size);

@@ -1,33 +1,40 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils.c                                            :+:      :+:    :+:   */
+/*   ft_realloc.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lviravon <marvin@d42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/07/15 12:37:26 by lviravon          #+#    #+#             */
-/*   Updated: 2026/07/15 12:37:26 by lviravon         ###   ########.fr       */
+/*   Created: 2026/07/15 14:54:53 by lviravon          #+#    #+#             */
+/*   Updated: 2026/07/15 14:54:53 by lviravon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "malloc.h"
 
-size_t	align_16(size_t size)
+void *realloc(void *ptr, size_t mem_size)
 {
-	return (((size + 15) / 16) * 16);
-}
-
-void	*ft_memcpy(void *dest, const void *src, size_t size)
-{
-	size_t	i;
-
-	if (src == NULL && dest == NULL)
-		return (NULL);
-	i = 0;
-	while (i != size)
+	if (ptr == NULL)
+		return (malloc(mem_size));
+	else if (mem_size == 0)
 	{
-		((char *)dest)[i] = ((char *)src)[i];
-		i++;
+		free(ptr);
+		return (NULL);
 	}
-	return (dest);
+
+	t_block *meta;
+	void *new_alloc;
+	size_t size_cpy;
+
+	meta = ((t_block *)ptr) - 1;
+
+	size_cpy = mem_size < meta->size ? mem_size : meta->size;
+
+	new_alloc = malloc(mem_size);
+	if (!new_alloc)
+		return (NULL);
+
+	ft_memcpy(new_alloc, ptr, size_cpy);
+	free(ptr);
+	return (new_alloc);
 }

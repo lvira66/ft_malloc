@@ -17,6 +17,7 @@
 # include <stdbool.h>
 # include <stdio.h>
 # include <math.h>
+# include <unistd.h>
 
 # define TINY 16480
 
@@ -42,9 +43,12 @@ typedef struct s_malloc_zone
 	t_zone *large;
 } malloc_zone;
 
-malloc_zone g_zones;
+extern malloc_zone g_zones;
 
 size_t	align_16(size_t size);
+void	*ft_memcpy(void *dest, const void *src, size_t size);
+void	*malloc(size_t size);
+void	free(void *ptr_user);
 
 #endif
 

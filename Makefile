@@ -5,9 +5,10 @@ endif
 NAME := libft_malloc_$(HOSTTYPE).so
 
 SRCS := ft_malloc.c \
-		ft_free.c
+		ft_free.c \
+		utils.c
 
-CFLAGS := -Wall -Werror -Wextra
+CFLAGS := -Wall -Werror -Wextra -fPIC
 
 CC := gcc
 
@@ -20,8 +21,8 @@ $(NAME) : $(OBJS)
 	ln -s $(NAME) libft_malloc.so
 
 
-OBJS : %.o : %.c	
-	$(CC) $(CFLAGS) -fPIC -c $< -o $@
+$(OBJS) : %.o : %.c	
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean : 
 	rm -f $(OBJS)
