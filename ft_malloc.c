@@ -12,7 +12,7 @@
 
 #include "malloc.h"
 
-malloc_zone g_zones;
+// malloc_zone g_zones;
 
 void *alloc_tiny(size_t size)
 {
@@ -203,7 +203,6 @@ void *alloc_large(size_t size)
 	ptr = new_zone->block;
 	return ((void *)(ptr + 1));
 }
-
 void *malloc(size_t size)
 {
 	int adjusted_size;
