@@ -6,7 +6,7 @@
 /*   By: lviravon <marvin@d42.fr>                   +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/06 15:41:42 by lviravon          #+#    #+#             */
-/*   Updated: 2026/07/06 15:41:42 by lviravon         ###   ########.fr       */
+/*   Updated: 2026/07/13 20:30:30 by lviravon         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ void *alloc_tiny(size_t size)
 			{
 				size_t old_size = ptr->size;
 				ptr->size = size + sizeof(t_block);
-				ptr->is_free = 0;
+				ptr->is_free = 1;
 
 
 				next = (t_block *)((char *)ptr + sizeof(t_block) + size);
@@ -101,11 +101,11 @@ void *alloc_small(size_t size)
 		g_zones.small = (t_zone *)mmap(NULL, 106496, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
 		if (g_zones.small == MAP_FAILED)
 			return (NULL);
-		g_zones.small->size = 16480;
+		g_zones.small->size = 106496;
 		g_zones.small->next = NULL;
 		g_zones.small->block = (t_block *)((char *)g_zones.small + sizeof(t_zone));
 
-		g_zones.small->block->size = 16480 - sizeof(t_zone) - sizeof(t_block);
+		g_zones.small->block->size = 106496 - sizeof(t_zone) - sizeof(t_block);
 		g_zones.small->block->is_free = 1;
 		g_zones.small->block->next = NULL;
 	}
@@ -144,14 +144,14 @@ void *alloc_small(size_t size)
 
 	t_zone *next_zone;
 
-	next_zone = (t_zone *)mmap(NULL, 16480, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
+	next_zone = (t_zone *)mmap(NULL, 106496, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
 	if (next_zone == MAP_FAILED)
 		return (NULL);
-	next_zone->size = 16480;
+	next_zone->size = 106496;
 	next_zone->next = NULL;
 	next_zone->block = (t_block *)((char *)next_zone + sizeof(t_zone));
 
-	next_zone->block->size = 16480 - sizeof(t_zone) - sizeof(t_block);
+	next_zone->block->size = 106496 - sizeof(t_zone) - sizeof(t_block);
 	next_zone->block->is_free = 1;
 	next_zone->block->next = NULL;
 	next_zone->next = g_zones.small->next;
@@ -202,4 +202,20 @@ void *alloc_large(size_t size)
 
 	ptr = new_zone->block;
 	return ((void *)(ptr + 1));
+}
+
+void *malloc(size_t size)
+{
+	int adjusted_size;
+
+	adjusted_size = align_16(size);
+
+	if (adjusted_size == 0)
+		return (NULL);
+	else if (adjusted_size <= 128)
+		return (alloc_tiny(adjusted_size));
+	else if (adjusted_size > 128 && adjusted_size <= 1024)
+		return (alloc_small(adjusted_size));
+	else
+		return (alloc_large(adjusted_size));
 }

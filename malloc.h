@@ -41,5 +41,6 @@ typedef struct s_malloc_zone
 	t_zone *large;
 } malloc_zone;
 
+size_t	align_16(size_t size);
 
 #endif
