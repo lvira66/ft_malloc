@@ -86,6 +86,6 @@ void	ft_put_ad(unsigned long nbr, char *base, int Ox)
 void	ft_putnbr_usigned(unsigned int nb)
 {
 	if (nb / 10 != 0)
-		ft_putnbr_usigned_pf(nb / 10);
+		ft_putnbr_usigned(nb / 10);
 	ft_putchar(nb % 10 + '0');
 }

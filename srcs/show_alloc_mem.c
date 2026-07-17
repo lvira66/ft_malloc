@@ -23,16 +23,17 @@ int aff_tiny(void)
 	t_block *curr_block;
 	current = g_zones.tiny;
 
-	while (current->next != NULL)
+	while (current != NULL)
 	{
 		curr_block = current->block;
-		while (curr_block->next != NULL)
+		while (curr_block != NULL)
 		{
 			if (curr_block->is_free == 0)
 			{
-				ft_put_ad((unsigned long)curr_block, HEXA_BASE, 0);
+				ft_put_ad((unsigned long)(curr_block + 1), HEXA_BASE, 0);
 				ft_putstr(" - ");
-				ft_put_ad((unsigned long)curr_block->next, HEXA_BASE, 0);
+				// ft_put_ad((unsigned long)(curr_block + curr_block->size), HEXA_BASE, 0);
+				ft_put_ad((unsigned long)((char *)(curr_block + 1) + curr_block->size), HEXA_BASE, 0);
 				ft_putstr(" : ");
 				ft_putnbr_usigned(curr_block->size);
 				tot += curr_block->size;
@@ -53,18 +54,20 @@ int aff_small(void)
 
 	t_zone *current;
 	t_block *curr_block;
-	current = g_zones.tiny;
+	current = g_zones.small;
 
-	while (current->next != NULL)
+	while (current != NULL)
 	{
 		curr_block = current->block;
-		while (curr_block->next != NULL)
+		while (curr_block != NULL)
 		{
 			if (curr_block->is_free == 0)
 			{
-				ft_put_ad((unsigned long)curr_block, HEXA_BASE, 0);
+				ft_put_ad((unsigned long)(curr_block + 1), HEXA_BASE, 0);
 				ft_putstr(" - ");
-				ft_put_ad((unsigned long)curr_block->next, HEXA_BASE, 0);
+				// ft_put_ad((unsigned long)curr_block->next, HEXA_BASE, 0);
+				// ft_put_ad((unsigned long)(curr_block + curr_block->size), HEXA_BASE, 0);
+				ft_put_ad((unsigned long)((char *)(curr_block + 1) + curr_block->size), HEXA_BASE, 0);
 				ft_putstr(" : ");
 				ft_putnbr_usigned(curr_block->size);
 				tot += curr_block->size;
@@ -86,25 +89,22 @@ int aff_large(void)
 
 	t_zone *current;
 	t_block *curr_block;
-	current = g_zones.tiny;
+	current = g_zones.large;
 
-	while (current->next != NULL)
+	while (current != NULL)
 	{
 		curr_block = current->block;
-		while (curr_block->next != NULL)
+		if (curr_block->is_free == 0)
 		{
-			if (curr_block->is_free == 0)
-			{
-				ft_put_ad((unsigned long)curr_block, HEXA_BASE, 0);
-				ft_putstr(" - ");
-				ft_put_ad((unsigned long)curr_block->next, HEXA_BASE, 0);
-				ft_putstr(" : ");
-				ft_putnbr_usigned(curr_block->size);
-				tot += curr_block->size;
-				ft_putstr(" bytes\n");
-			}
-			curr_block = curr_block->next;
+			ft_put_ad((unsigned long)(curr_block + 1), HEXA_BASE, 0);
+			ft_putstr(" - ");
+			ft_put_ad((unsigned long)((char *)(curr_block + 1) + curr_block->size), HEXA_BASE, 0);
+			ft_putstr(" : ");
+			ft_putnbr_usigned(curr_block->size);
+			tot += curr_block->size;
+			ft_putstr(" bytes\n");
 		}
+		curr_block = curr_block->next;
 		current = current->next;
 	}
 	return (tot);

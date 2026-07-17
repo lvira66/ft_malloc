@@ -48,7 +48,7 @@ void *alloc_tiny(size_t size)
 			{
 				size_t old_size = ptr->size;
 				ptr->size = size + sizeof(t_block);
-				ptr->is_free = 1;
+				ptr->is_free = 0;
 
 
 				next = (t_block *)((char *)ptr + sizeof(t_block) + size);
@@ -56,7 +56,6 @@ void *alloc_tiny(size_t size)
 				next->next = ptr->next;
 
 				ptr->next = next;
-
 				return ((void *)(ptr + 1));
 			}
 			else if (ptr->is_free == 1 && ptr->size >= size)
@@ -205,7 +204,6 @@ void *alloc_large(size_t size)
 }
 void *malloc(size_t size)
 {
-	write(1, "MALLOC APPELÉ !\n", 17);
 	int adjusted_size;
 
 	adjusted_size = align_16(size);
