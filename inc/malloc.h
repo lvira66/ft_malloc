@@ -20,6 +20,7 @@
 # include <unistd.h>
 
 # define TINY 16480
+# define HEXA_BASE "0123456789ABCDEF"
 
 
 typedef struct s_block
@@ -50,5 +51,9 @@ void	*ft_memcpy(void *dest, const void *src, size_t size);
 void	*malloc(size_t size);
 void	free(void *ptr_user);
 void	show_alloc_mem(void);
+void	ft_putnbr_usigned(unsigned int nb);
+void	ft_put_ad(unsigned long nbr, char *base, int Ox);
+void	ft_putstr(char *s);
+void	ft_putchar(char c);
 
 #endif
