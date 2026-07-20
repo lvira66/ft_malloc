@@ -14,7 +14,7 @@
 
 malloc_zone g_zones;
 
-void *alloc_tiny(size_t size)
+void *alloc_tiny(size_t size, size_t real_size)
 {
 	t_block *ptr;
 	t_block *next;
@@ -47,7 +47,7 @@ void *alloc_tiny(size_t size)
 			if (ptr->is_free == 1 && ptr->size >= (size + sizeof(t_block) + 1))
 			{
 				size_t old_size = ptr->size;
-				ptr->size = size + sizeof(t_block);
+				ptr->size = real_size;
 				ptr->is_free = 0;
 
 
@@ -84,10 +84,10 @@ void *alloc_tiny(size_t size)
 	next_zone->next = g_zones.tiny->next;
 
 	g_zones.tiny->next = next_zone;
-	return (alloc_tiny(size));
+	return (alloc_tiny(size, real_size));
 }
 
-void *alloc_small(size_t size)
+void *alloc_small(size_t size, size_t real_size)
 {
 	t_block *ptr;
 	t_block *next;
@@ -120,7 +120,7 @@ void *alloc_small(size_t size)
 			if (ptr->is_free == 1 && ptr->size >= (size + sizeof(t_block) + 1))
 			{
 				size_t old_size = ptr->size;
-				ptr->size = size + sizeof(t_block);
+				ptr->size = real_size;
 				ptr->is_free = 0;
 
 
@@ -158,10 +158,10 @@ void *alloc_small(size_t size)
 	next_zone->next = g_zones.small->next;
 
 	g_zones.small->next = next_zone;
-	return (alloc_small(size));
+	return (alloc_small(size, real_size));
 }
 
-void *alloc_large(size_t size)
+void *alloc_large(size_t size, size_t real_size)
 {
 	size_t tot_req;
 	size_t final_size;
@@ -181,7 +181,7 @@ void *alloc_large(size_t size)
 	new_zone->next = NULL;
 	new_zone->block = (t_block *)((char *)new_zone + sizeof(t_zone));
 
-	new_zone->block->size = final_size - sizeof(t_zone) - sizeof(t_block);
+	new_zone->block->size = real_size; //final_size - sizeof(t_zone) - sizeof(t_block);
 	new_zone->block->is_free = 0;
 	new_zone->block->next = NULL;
 
@@ -213,9 +213,9 @@ void *malloc(size_t size)
 	if (adjusted_size == 0)
 		return (NULL);
 	else if (adjusted_size <= 128)
-		return (alloc_tiny(adjusted_size));
+		return (alloc_tiny(adjusted_size, size));
 	else if (adjusted_size > 128 && adjusted_size <= 1024)
-		return (alloc_small(adjusted_size));
+		return (alloc_small(adjusted_size, size));
 	else
-		return (alloc_large(adjusted_size));
+		return (alloc_large(adjusted_size, size));
 }

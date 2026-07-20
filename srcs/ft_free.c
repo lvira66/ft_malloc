@@ -110,7 +110,10 @@ int find_large(t_block *mem)
 void free(void *ptr_user)
 {
 	if (ptr_user == NULL)
+	{
+		write(2, "free(): invalid pointer\n", 24);
 		return ;
+	}
 
 	t_block *mem;
 
