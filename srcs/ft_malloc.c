@@ -53,6 +53,7 @@ void *alloc_tiny(size_t size)
 
 				next = (t_block *)((char *)ptr + sizeof(t_block) + size);
 				next->size = old_size - size - sizeof(t_block);
+				next->is_free = 1;
 				next->next = ptr->next;
 
 				ptr->next = next;
@@ -125,6 +126,7 @@ void *alloc_small(size_t size)
 
 				next = (t_block *)((char *)ptr + sizeof(t_block) + size);
 				next->size = old_size - size - sizeof(t_block);
+				next->is_free = 1;
 				next->next = ptr->next;
 
 				ptr->next = next;
