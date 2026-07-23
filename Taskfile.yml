@@ -1,0 +1,55 @@
+version: "3"
+
+vars:
+  HOST_TYPE:
+    sh: echo -n "$(uname -m)_$(uname -s)"
+
+  NAME: libft_malloc_{{.HOST_TYPE}}.so
+
+  SRCS:
+    - srcs/ft_free.c
+    - srcs/ft_malloc.c
+    - srcs/ft_realloc.c
+    - srcs/show_alloc_mem.c
+    - srcs/utils.c
+
+  FLAGS: -Werror -Wextra -Wall -fPIC
+
+tasks:
+  default: # = all in Makefile
+    cmds:
+      - task: build
+
+  build:
+    desc: "Compilation lib .so"
+    deps: [dirs]
+    sources:
+      - "{{.SRCS}}"
+    generates:
+      - "{{.NAME}}"
+    cmds:
+      - for: { var: SRCS }
+        cmd: gcc {{.FLAGS}} -c "{{.ITEM}}" -o objs/{{base .ITEM | replace ".c" ".o"}}
+
+      - gcc -shared -o {{.NAME}} objs/*.o
+      - ln -sf {{.NAME}} libft_malloc.so
+
+  dirs:
+    cmds:
+      - mkdir -p objs
+    internal: true
+
+  clean:
+    desc: "Remove .o and objs folder"
+    cmds:
+      - rm -rf objs
+
+  fclean:
+    desc: "Do clean task and remove the lib"
+    deps: [clean]
+    cmds: 
+      - rm -f "{{.NAME}}" libft_malloc.so
+
+  re:
+    desc: "Recompilation of the lib"
+    deps: [fclean, build]

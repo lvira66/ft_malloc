@@ -18,6 +18,7 @@
 # include <stdio.h>
 # include <math.h>
 # include <unistd.h>
+# include <pthread.h>
 
 # define TINY 16480
 # define HEXA_BASE "0123456789ABCDEF"
