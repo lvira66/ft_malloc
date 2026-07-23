@@ -12,7 +12,7 @@
 
 #include "../inc/malloc.h"
 
-malloc_zone g_zones;
+malloc_zone g_zones = {PTHREAD_MUTEX_INITIALIZER, NULL, NULL, NULL};
 
 void *alloc_tiny(size_t size, size_t real_size)
 {
@@ -207,15 +207,21 @@ void *alloc_large(size_t size, size_t real_size)
 void *malloc(size_t size)
 {
 	int adjusted_size;
+	void *ptr;
 
 	adjusted_size = align_16(size);
-
+	pthread_mutex_lock(&g_zones.mut);
 	if (adjusted_size == 0)
+	{
+		pthread_mutex_unlock(&g_zones.mut);
 		return (NULL);
+	}
 	else if (adjusted_size <= 128)
-		return (alloc_tiny(adjusted_size, size));
+		ptr = alloc_tiny(adjusted_size, size);
 	else if (adjusted_size > 128 && adjusted_size <= 1024)
-		return (alloc_small(adjusted_size, size));
+		ptr = alloc_small(adjusted_size, size);
 	else
-		return (alloc_large(adjusted_size, size));
+		ptr = alloc_large(adjusted_size, size);
+	pthread_mutex_unlock(&g_zones.mut);
+	return (ptr);
 }

@@ -89,16 +89,22 @@ static int is_exist(void *ptr)
 
 void *realloc(void *ptr, size_t mem_size)
 {
+	pthread_mutex_lock(&g_zones.mut);
 	if (ptr == NULL)
+	{
+		pthread_mutex_unlock(&g_zones.mut);
 		return (malloc(mem_size));
+	}
 	else if (mem_size == 0)
 	{
 		free(ptr);
+		pthread_mutex_unlock(&g_zones.mut);
 		return (NULL);
 	}
 	if (is_exist(ptr) == 0)
 	{
 		write(2, "realloc(): invalid pointer\n", 27);
+		pthread_mutex_unlock(&g_zones.mut);
 		return (NULL);
 	}
 
@@ -112,9 +118,13 @@ void *realloc(void *ptr, size_t mem_size)
 
 	new_alloc = malloc(mem_size);
 	if (!new_alloc)
+	{
+		pthread_mutex_unlock(&g_zones.mut);
 		return (NULL);
+	}
 
 	ft_memcpy(new_alloc, ptr, size_cpy);
 	free(ptr);
+	pthread_mutex_unlock(&g_zones.mut);
 	return (new_alloc);
 }

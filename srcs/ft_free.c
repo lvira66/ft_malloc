@@ -109,9 +109,11 @@ int find_large(t_block *mem)
 
 void free(void *ptr_user)
 {
+	pthread_mutex_lock(&g_zones.mut);
 	if (ptr_user == NULL)
 	{
 		write(2, "free(): invalid pointer\n", 24);
+		pthread_mutex_unlock(&g_zones.mut);
 		return ;
 	}
 
@@ -120,8 +122,15 @@ void free(void *ptr_user)
 	mem = ((t_block *)ptr_user) - 1;
 	
 	if (find_tiny(mem))
+	{
+		pthread_mutex_unlock(&g_zones.mut);
 		return ;
+	}
 	if (find_small(mem))
+	{
+		pthread_mutex_unlock(&g_zones.mut);
 		return ;
+	}
+	pthread_mutex_unlock(&g_zones.mut);
 	find_large(mem);
 }

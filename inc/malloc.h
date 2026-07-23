@@ -40,6 +40,7 @@ typedef struct s_zone
 
 typedef struct s_malloc_zone
 {
+	pthread_mutex_t mut;
 	t_zone *tiny;
 	t_zone *small;
 	t_zone *large;
