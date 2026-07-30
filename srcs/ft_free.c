@@ -112,7 +112,6 @@ void free(void *ptr_user)
 	pthread_mutex_lock(&g_zones.mut);
 	if (ptr_user == NULL)
 	{
-		write(2, "free(): invalid pointer\n", 24);
 		pthread_mutex_unlock(&g_zones.mut);
 		return ;
 	}
@@ -131,6 +130,12 @@ void free(void *ptr_user)
 		pthread_mutex_unlock(&g_zones.mut);
 		return ;
 	}
+	if (find_large(mem))
+	{
+		pthread_mutex_unlock(&g_zones.mut);
+		return;
+	}
+	write(2, "free(): invalid pointer\n", 24);
 	pthread_mutex_unlock(&g_zones.mut);
-	find_large(mem);
 }
+

@@ -11,6 +11,7 @@ vars:
     - srcs/ft_malloc.c
     - srcs/ft_realloc.c
     - srcs/show_alloc_mem.c
+    - srcs/show_alloc_mem_ex.c
     - srcs/utils.c
 
   FLAGS: -Werror -Wextra -Wall -fPIC

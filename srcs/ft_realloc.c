@@ -97,8 +97,8 @@ void *realloc(void *ptr, size_t mem_size)
 	}
 	else if (mem_size == 0)
 	{
-		free(ptr);
 		pthread_mutex_unlock(&g_zones.mut);
+		free(ptr);
 		return (NULL);
 	}
 	if (is_exist(ptr) == 0)
@@ -116,7 +116,9 @@ void *realloc(void *ptr, size_t mem_size)
 
 	size_cpy = mem_size < meta->size ? mem_size : meta->size;
 
+	pthread_mutex_unlock(&g_zones.mut);
 	new_alloc = malloc(mem_size);
+	pthread_mutex_lock(&g_zones.mut);
 	if (!new_alloc)
 	{
 		pthread_mutex_unlock(&g_zones.mut);
@@ -124,7 +126,7 @@ void *realloc(void *ptr, size_t mem_size)
 	}
 
 	ft_memcpy(new_alloc, ptr, size_cpy);
-	free(ptr);
 	pthread_mutex_unlock(&g_zones.mut);
+	free(ptr);
 	return (new_alloc);
 }

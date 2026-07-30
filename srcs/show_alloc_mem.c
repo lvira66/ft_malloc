@@ -110,7 +110,7 @@ int aff_large(void)
 void show_alloc_mem(void)
 {
 	int tot = 0;
-
+	pthread_mutex_lock(&g_zones.mut);
 	if (g_zones.tiny)
 		tot += aff_tiny();
 	else
@@ -127,4 +127,5 @@ void show_alloc_mem(void)
 	ft_putstr("Total : ");
 	ft_putnbr_usigned(tot);
 	ft_putstr(" bytes\n");
+	pthread_mutex_unlock(&g_zones.mut);
 }
