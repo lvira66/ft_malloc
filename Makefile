@@ -8,7 +8,6 @@ SRCS := srcs/ft_malloc.c \
 		srcs/ft_free.c \
 		srcs/ft_realloc.c\
 		srcs/show_alloc_mem.c \
-		srcs/show_alloc_mem_ex.c \
 		srcs/utils.c
 
 CFLAGS := -Wall -Werror -Wextra -fPIC
