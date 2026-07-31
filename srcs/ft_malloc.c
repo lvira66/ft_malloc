@@ -20,19 +20,21 @@ void *alloc_tiny(size_t size, size_t real_size)
 	t_block *next;
 	t_zone *current;
 
+	size_t page_nb = get_pagenb(TINY);
+
 	ptr = NULL;
 	next = NULL;
 
 	if (g_zones.tiny == NULL)
 	{
-		g_zones.tiny = (t_zone *)mmap(NULL, 16480, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
+		g_zones.tiny = (t_zone *)mmap(NULL, page_nb, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
 		if (g_zones.tiny == MAP_FAILED)
 			return (NULL);
-		g_zones.tiny->size = 16480;
+		g_zones.tiny->size = page_nb;
 		g_zones.tiny->next = NULL;
 		g_zones.tiny->block = (t_block *)((char *)g_zones.tiny + sizeof(t_zone));
 
-		g_zones.tiny->block->size = 16480 - sizeof(t_zone) - sizeof(t_block);
+		g_zones.tiny->block->size = page_nb - sizeof(t_zone) - sizeof(t_block);
 		g_zones.tiny->block->is_free = 1;
 		g_zones.tiny->block->next = NULL;
 	}
@@ -71,14 +73,14 @@ void *alloc_tiny(size_t size, size_t real_size)
 
 	t_zone *next_zone;
 
-	next_zone = (t_zone *)mmap(NULL, 16480, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
+	next_zone = (t_zone *)mmap(NULL, page_nb, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
 	if (next_zone == MAP_FAILED)
 		return (NULL);
-	next_zone->size = 16480;
+	next_zone->size = page_nb;
 	next_zone->next = NULL;
 	next_zone->block = (t_block *)((char *)next_zone + sizeof(t_zone));
 
-	next_zone->block->size = 16480 - sizeof(t_zone) - sizeof(t_block);
+	next_zone->block->size = page_nb - sizeof(t_zone) - sizeof(t_block);
 	next_zone->block->is_free = 1;
 	next_zone->block->next = NULL;
 	next_zone->next = g_zones.tiny->next;
@@ -93,19 +95,21 @@ void *alloc_small(size_t size, size_t real_size)
 	t_block *next;
 	t_zone *current;
 
+	size_t page_nb = get_pagenb(SMALL);
+
 	ptr = NULL;
 	next = NULL;
 
 	if (g_zones.small == NULL)
 	{
-		g_zones.small = (t_zone *)mmap(NULL, 106496, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
+		g_zones.small = (t_zone *)mmap(NULL, page_nb, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
 		if (g_zones.small == MAP_FAILED)
 			return (NULL);
-		g_zones.small->size = 106496;
+		g_zones.small->size = page_nb;
 		g_zones.small->next = NULL;
 		g_zones.small->block = (t_block *)((char *)g_zones.small + sizeof(t_zone));
 
-		g_zones.small->block->size = 106496 - sizeof(t_zone) - sizeof(t_block);
+		g_zones.small->block->size = page_nb - sizeof(t_zone) - sizeof(t_block);
 		g_zones.small->block->is_free = 1;
 		g_zones.small->block->next = NULL;
 	}
@@ -145,14 +149,14 @@ void *alloc_small(size_t size, size_t real_size)
 
 	t_zone *next_zone;
 
-	next_zone = (t_zone *)mmap(NULL, 106496, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
+	next_zone = (t_zone *)mmap(NULL, page_nb, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
 	if (next_zone == MAP_FAILED)
 		return (NULL);
-	next_zone->size = 106496;
+	next_zone->size = page_nb;
 	next_zone->next = NULL;
 	next_zone->block = (t_block *)((char *)next_zone + sizeof(t_zone));
 
-	next_zone->block->size = 106496 - sizeof(t_zone) - sizeof(t_block);
+	next_zone->block->size = page_nb - sizeof(t_zone) - sizeof(t_block);
 	next_zone->block->is_free = 1;
 	next_zone->block->next = NULL;
 	next_zone->next = g_zones.small->next;

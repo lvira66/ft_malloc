@@ -38,6 +38,11 @@ int find_tiny(t_block *mem)
 					prev->size += current->size + sizeof(t_block);
 					prev->next = current->next;
 				}
+				if (check_zone(g_zones.tiny))
+				{
+					t_zone *ptr = g_zones.tiny;
+					munmap(ptr, ptr->size);
+				}
 				return (1);
 			}
 			prev = current;
@@ -72,6 +77,11 @@ int find_small(t_block *mem)
 				{
 					prev->size += current->size + sizeof(t_block);
 					prev->next = current->next;
+				}
+				if (check_zone(g_zones.small))
+				{
+					t_zone *ptr = g_zones.small;
+					munmap(ptr, ptr->size);
 				}
 				return (1);
 			}

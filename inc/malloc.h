@@ -20,9 +20,13 @@
 # include <unistd.h>
 # include <pthread.h>
 
-# define TINY 16480
 # define HEXA_BASE "0123456789ABCDEF"
 
+enum ZONE
+{
+	TINY,
+	SMALL,
+};
 
 typedef struct s_block
 {
@@ -59,5 +63,7 @@ void	ft_put_ad(unsigned long nbr, char *base, int Ox);
 void	ft_putstr(char *s);
 void	ft_putchar(char c);
 void	show_alloc_mem(void);
+size_t	get_pagenb(int zone);
+bool	check_zone(t_zone *zone);
 
 #endif

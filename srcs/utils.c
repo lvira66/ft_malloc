@@ -89,3 +89,32 @@ void	ft_putnbr_usigned(unsigned int nb)
 		ft_putnbr_usigned(nb / 10);
 	ft_putchar(nb % 10 + '0');
 }
+
+size_t get_pagenb(int zone)
+{
+	int page_size = getpagesize();
+	if (zone == TINY)
+	{
+		int req = (sizeof(t_block) + 128 * 100);
+		return (((req + page_size - 1) / page_size) * page_size);
+	}
+	else if (zone == SMALL)
+	{
+		int req = (sizeof(t_block) + 1024) * 100;
+		return (((req + page_size - 1) / page_size) * page_size);
+	}
+	return (0);
+}
+
+bool check_zone(t_zone *zone)
+{
+	t_zone *current = zone;
+
+	while (current != NULL)
+	{
+		if (current->block->is_free == 0)
+			return (0);
+		current = current->next;
+	}
+	return (1);
+}
