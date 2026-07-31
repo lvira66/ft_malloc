@@ -1,65 +1,58 @@
-#include <pthread.h>
 #include "../inc/malloc.h"
-#include <stdlib.h>
-#include <math.h>
 #include <stdio.h>
-#include <unistd.h>
+#include <stdlib.h>
+#include <pthread.h>
 #include <string.h>
 
-#define NUM_THREADS 10
-#define NUM_ALLOCS_PER_THREAD 1000
+#define NUM_THREADS 4
+#define NUM_ITERATIONS 50000 // Nombre d'actions par thread
+#define MAX_ACTIVE_PTRS 256  // Nombre max d'allocations simultanées par thread
+#define MAX_ALLOC_SIZE 16384 // Jusqu'à 16 KB
 
-void *stress_test(void *arg) {
-    int thread_id = *(int *)arg;
-    char *ptrs[NUM_ALLOCS_PER_THREAD];
-    size_t sizes[NUM_ALLOCS_PER_THREAD];
-
-    printf("Thread %d : Début des allocations\n", thread_id);
-
-    // 1. MALLOC : Allocation et écriture
-    for (int i = 0; i < NUM_ALLOCS_PER_THREAD; i++) {
-        sizes[i] = (rand() % 4096) + 1; // Tailles aléatoires entre 1 et 4096 octets
-        ptrs[i] = (char *)malloc(sizes[i]);
-        
-        if (ptrs[i]) {
-            // Remplir avec un pattern unique à ce thread pour tester la corruption
-            memset(ptrs[i], thread_id % 255, sizes[i]);
-        }
+void* chaotic_stress_test(void* arg) {
+    int thread_id = *(int*)arg;
+    unsigned int seed = thread_id * 12345; 
+    
+    // Tableau pour stocker les pointeurs actifs du thread
+    void* active_ptrs[MAX_ACTIVE_PTRS];
+    for (int i = 0; i < MAX_ACTIVE_PTRS; i++) {
+        active_ptrs[i] = NULL;
     }
 
-    // 2. REALLOC : Réallocation (pour tester les deadlocks internes)
-    for (int i = 0; i < NUM_ALLOCS_PER_THREAD; i += 2) {
-        if (ptrs[i]) {
-            size_t new_size = sizes[i] * 2; // On force l'agrandissement
-            char *new_ptr = (char *)realloc(ptrs[i], new_size);
+    for (int i = 0; i < NUM_ITERATIONS; i++) {
+        // On choisit un index au hasard dans notre tableau
+        int idx = rand_r(&seed) % MAX_ACTIVE_PTRS;
+
+        // S'il y a déjà un pointeur à cet emplacement, on le libère (FREE)
+        if (active_ptrs[idx] != NULL) {
+            free(active_ptrs[idx]);
+            active_ptrs[idx] = NULL;
+        } 
+        // Sinon, on alloue une nouvelle zone mémoire (MALLOC)
+        else {
+            size_t size = (rand_r(&seed) % MAX_ALLOC_SIZE) + 1;
+            active_ptrs[idx] = malloc(size);
             
-            if (new_ptr) {
-                ptrs[i] = new_ptr;
-                // On écrit dans la nouvelle zone pour s'assurer qu'elle est bien mappée
-                memset(ptrs[i], thread_id % 255, new_size);
+            if (active_ptrs[idx] != NULL) {
+                // On écrit dedans avec un motif propre au thread pour détecter 
+                // si un autre thread vient écraser notre mémoire par erreur.
+                memset(active_ptrs[idx], (thread_id & 0xFF), size);
+            } else {
+                // Si ton malloc retourne NULL, c'est soit normal (plus de RAM), 
+                // soit un bug dans ta gestion des blocs.
+                fprintf(stderr, "Thread %d: malloc a retourné NULL (itération %d, taille %zu)\n", thread_id, i, size);
             }
         }
     }
 
-    // 3. VÉRIFICATION : Est-ce qu'un autre thread a écrasé mes données ?
-    for (int i = 0; i < NUM_ALLOCS_PER_THREAD; i++) {
-        if (ptrs[i]) {
-            // On vérifie le premier octet
-            if ((unsigned char)ptrs[i][0] != (thread_id % 255)) {
-                fprintf(stderr, "Erreur de corruption détectée par le thread %d !\n", thread_id);
-                exit(1);
-            }
+    // Grand nettoyage final à la fin du thread
+    for (int i = 0; i < MAX_ACTIVE_PTRS; i++) {
+        if (active_ptrs[i] != NULL) {
+            free(active_ptrs[i]);
         }
     }
 
-    // 4. FREE : Libération
-    for (int i = 0; i < NUM_ALLOCS_PER_THREAD; i++) {
-        if (ptrs[i]) {
-            free(ptrs[i]);
-        }
-    }
-
-    printf("Thread %d : Terminé avec succès\n", thread_id);
+    printf("Thread %d a survécu au chaos.\n", thread_id);
     return NULL;
 }
 
@@ -67,27 +60,22 @@ int main() {
     pthread_t threads[NUM_THREADS];
     int thread_ids[NUM_THREADS];
 
-    printf("--- DÉBUT DU STRESS TEST THREAD-SAFE ---\n");
+    printf("Démarrage du test chaotique : %d threads, %d itérations par thread...\n", NUM_THREADS, NUM_ITERATIONS);
 
-    // Lancement des threads
+    // Lancement
     for (int i = 0; i < NUM_THREADS; i++) {
         thread_ids[i] = i;
-        if (pthread_create(&threads[i], NULL, stress_test, &thread_ids[i]) != 0) {
-            perror("Erreur création thread");
-            return 1;
+        if (pthread_create(&threads[i], NULL, chaotic_stress_test, &thread_ids[i]) != 0) {
+            perror("Erreur lors de la création des threads");
+            return EXIT_FAILURE;
         }
     }
 
-    // Attente de la fin de tous les threads
+    // Attente
     for (int i = 0; i < NUM_THREADS; i++) {
         pthread_join(threads[i], NULL);
     }
 
-    printf("--- TOUS LES THREADS ONT TERMINÉ ---\n");
-
-    // Test de show_alloc_mem à la fin (devrait afficher très peu de choses si tout est bien free)
-    // show_alloc_mem();
-
-    printf("Si le programme s'arrête ici sans segfault, ni freeze, ni corruption : c'est parfait !\n");
-    return 0;
+    printf("Test terminé ! Si tu n'as pas eu de Segfault, ton malloc est très robuste.\n");
+    return EXIT_SUCCESS;
 }

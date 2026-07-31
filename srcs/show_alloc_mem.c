@@ -34,8 +34,8 @@ int aff_tiny(void)
 				ft_putstr(" - ");
 				ft_put_ad((unsigned long)((char *)(curr_block + 1) + curr_block->size), HEXA_BASE, 0);
 				ft_putstr(" : ");
-				ft_putnbr_usigned(curr_block->size);
-				tot += curr_block->size;
+				ft_putnbr_usigned(curr_block->real_size);
+				tot += curr_block->real_size;
 				ft_putstr(" bytes\n");
 			}
 			curr_block = curr_block->next;
@@ -66,8 +66,8 @@ int aff_small(void)
 				ft_putstr(" - ");
 				ft_put_ad((unsigned long)((char *)(curr_block + 1) + curr_block->size), HEXA_BASE, 0);
 				ft_putstr(" : ");
-				ft_putnbr_usigned(curr_block->size);
-				tot += curr_block->size;
+				ft_putnbr_usigned(curr_block->real_size);
+				tot += curr_block->real_size;
 				ft_putstr(" bytes\n");
 			}
 			curr_block = curr_block->next;
@@ -97,8 +97,8 @@ int aff_large(void)
 			ft_putstr(" - ");
 			ft_put_ad((unsigned long)((char *)(curr_block + 1) + curr_block->size), HEXA_BASE, 0);
 			ft_putstr(" : ");
-			ft_putnbr_usigned(curr_block->size);
-			tot += curr_block->size;
+			ft_putnbr_usigned(curr_block->real_size);
+			tot += curr_block->real_size;
 			ft_putstr(" bytes\n");
 		}
 		curr_block = curr_block->next;

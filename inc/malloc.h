@@ -31,6 +31,7 @@ enum ZONE
 typedef struct s_block
 {
 	size_t size;
+	size_t real_size;
 	bool is_free;
 	struct s_block *next;
 } t_block;

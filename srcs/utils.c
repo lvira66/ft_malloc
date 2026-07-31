@@ -110,11 +110,11 @@ bool check_zone(t_zone *zone)
 {
 	t_zone *current = zone;
 
-	while (current != NULL)
+	while (current->block != NULL)
 	{
 		if (current->block->is_free == 0)
 			return (0);
-		current = current->next;
+		current->block = current->block->next;
 	}
 	return (1);
 }

@@ -49,7 +49,8 @@ void *alloc_tiny(size_t size, size_t real_size)
 			if (ptr->is_free == 1 && ptr->size >= (size + sizeof(t_block) + 1))
 			{
 				size_t old_size = ptr->size;
-				ptr->size = real_size;
+				ptr->size = size;
+				ptr->real_size = real_size;
 				ptr->is_free = 0;
 
 
@@ -64,6 +65,7 @@ void *alloc_tiny(size_t size, size_t real_size)
 			else if (ptr->is_free == 1 && ptr->size >= size)
 			{
 				ptr->is_free = 0;
+				ptr->real_size = real_size;
 				return ((void *)(ptr + 1));
 			}
 			ptr = ptr->next;
@@ -124,7 +126,8 @@ void *alloc_small(size_t size, size_t real_size)
 			if (ptr->is_free == 1 && ptr->size >= (size + sizeof(t_block) + 1))
 			{
 				size_t old_size = ptr->size;
-				ptr->size = real_size;
+				ptr->size = size;
+				ptr->real_size = real_size;
 				ptr->is_free = 0;
 
 
@@ -140,6 +143,7 @@ void *alloc_small(size_t size, size_t real_size)
 			else if (ptr->is_free == 1 && ptr->size >= size)
 			{
 				ptr->is_free = 0;
+				ptr->real_size = real_size;
 				return ((void *)(ptr + 1));
 			}
 			ptr = ptr->next;
@@ -185,7 +189,8 @@ void *alloc_large(size_t size, size_t real_size)
 	new_zone->next = NULL;
 	new_zone->block = (t_block *)((char *)new_zone + sizeof(t_zone));
 
-	new_zone->block->size = real_size; //final_size - sizeof(t_zone) - sizeof(t_block);
+	new_zone->block->size = size;
+	new_zone->block->real_size = real_size;
 	new_zone->block->is_free = 0;
 	new_zone->block->next = NULL;
 

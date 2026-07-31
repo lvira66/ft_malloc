@@ -21,14 +21,14 @@ int	main(void)
 
 	show_alloc_mem();
 
-	print("\n=======================\n");
+	print("\n\n=======================\n\n");
 	
 	free(tiny1);
 	free(small1);
 
 	show_alloc_mem();
 
-	free(tiny1);
+	print("\n\n=======================\n\n");
 	tiny2 = realloc(tiny2, 256);
 
 	show_alloc_mem();

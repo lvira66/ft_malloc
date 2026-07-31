@@ -15,6 +15,7 @@
 int find_tiny(t_block *mem)
 {
 	t_zone *tiny;
+	t_zone *prev_zone = NULL;
 	t_block *current;
 	t_block *prev;
 
@@ -27,6 +28,10 @@ int find_tiny(t_block *mem)
 		{
 			if (current == mem)
 			{
+				if (current->is_free == 1)
+				{
+					write(1, "free(): double free detected\n", 29);
+				}
 				mem->is_free = 1;
 				if (current->next != NULL && current->next->is_free == 1)
 				{
@@ -38,17 +43,20 @@ int find_tiny(t_block *mem)
 					prev->size += current->size + sizeof(t_block);
 					prev->next = current->next;
 				}
-				if (check_zone(g_zones.tiny))
+				if (check_zone(tiny))
 				{
-					t_zone *ptr = g_zones.tiny;
-					munmap(ptr, ptr->size);
-					g_zones.tiny = NULL;
+					if (prev_zone != NULL)
+						prev_zone->next = tiny->next;
+					else
+						g_zones.tiny = tiny->next;
+					munmap(tiny, tiny->size);
 				}
 				return (1);
 			}
 			prev = current;
 			current = current->next;
 		}
+		prev_zone = tiny;
 		tiny = tiny->next;
 	}
 	return (0);
@@ -56,6 +64,7 @@ int find_tiny(t_block *mem)
 int find_small(t_block *mem)
 {
 	t_zone *small;
+	t_zone *prev_zone = NULL;
 	t_block *current;
 	t_block *prev;
 
@@ -79,17 +88,20 @@ int find_small(t_block *mem)
 					prev->size += current->size + sizeof(t_block);
 					prev->next = current->next;
 				}
-				if (check_zone(g_zones.small))
+				if (check_zone(small))
 				{
-					t_zone *ptr = g_zones.small;
-					munmap(ptr, ptr->size);
-					g_zones.small = NULL;
+					if (prev_zone != NULL)
+						prev_zone->next = small->next;
+					else
+						g_zones.small = small->next;
+					munmap(small, small->size);
 				}
 				return (1);
 			}
 			prev = current;
 			current = current->next;
 		}
+		prev_zone = small;
 		small = small->next;
 	}
 	return (0);

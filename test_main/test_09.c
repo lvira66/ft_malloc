@@ -13,20 +13,19 @@ int main(void)
     printf("--- 1. PHASE D'ALLOCATION INITIALE (MALLOC) ---\n");
     for (int i = 0; i < NUM_ALLOCS; i++)
     {
-        sizes[i] = (rand() % 4096) + 1; // Tailles variées (Tiny et Small)
+        sizes[i] = (rand() % 4096) + 1;
         ptrs[i] = (char *)malloc(sizes[i]);
 
         if (!ptrs[i]) {
             fprintf(stderr, "Erreur : Malloc a renvoyé NULL à l'index %d\n", i);
             return (1);
         }
-        // Remplit avec un motif reconnaissable (ex: 'A' + (i % 26))
         memset(ptrs[i], 'A' + (i % 26), sizes[i]);
     }
     printf("-> %d allocations réussies.\n\n", NUM_ALLOCS);
 
     printf("--- 2. PHASE DE RÉALLOCATION (REALLOC) ---\n");
-    for (int i = 0; i < NUM_ALLOCS; i += 2) // On redimensionne un bloc sur deux
+    for (int i = 0; i < NUM_ALLOCS; i += 2)
     {
         size_t new_size = sizes[i] * 2;
         char *new_ptr = (char *)realloc(ptrs[i], new_size);
@@ -37,8 +36,6 @@ int main(void)
         }
 
         ptrs[i] = new_ptr;
-        // Remplit la nouvelle taille. Si realloc a donné un bloc trop petit,
-        // ce memset va écraser le header du bloc suivant !
         memset(ptrs[i], 'B' + (i % 26), new_size);
     }
     printf("-> Réallocations terminées.\n\n");
@@ -53,12 +50,9 @@ int main(void)
     }
     printf("-> Données intactes.\n\n");
 
-    printf("--- 4. PHASE DE LIBÉRATION (FREE) ---\n");
     for (int i = 0; i < NUM_ALLOCS; i++)
     {
         if (ptrs[i]) {
-            // Si le header a été altéré pendant le realloc/memset,
-            // free() affichera "invalid pointer" ou segfault ici.
             free(ptrs[i]);
         }
     }
