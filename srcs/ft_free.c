@@ -42,6 +42,7 @@ int find_tiny(t_block *mem)
 				{
 					t_zone *ptr = g_zones.tiny;
 					munmap(ptr, ptr->size);
+					g_zones.tiny = NULL;
 				}
 				return (1);
 			}
@@ -82,6 +83,7 @@ int find_small(t_block *mem)
 				{
 					t_zone *ptr = g_zones.small;
 					munmap(ptr, ptr->size);
+					g_zones.small = NULL;
 				}
 				return (1);
 			}

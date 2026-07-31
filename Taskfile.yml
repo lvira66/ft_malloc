@@ -1,10 +1,10 @@
 version: "3"
 
 vars:
-  HOST_TYPE:
-    sh: echo -n "$(uname -m)_$(uname -s)"
+  HOSTTYPE:
+    sh: echo -n "${HOSTTYPE:-$(uname -m)_$(uname -s)}"
 
-  NAME: libft_malloc_{{.HOST_TYPE}}.so
+  NAME: libft_malloc_{{.HOSTTYPE}}.so
 
   SRCS:
     - srcs/ft_free.c
